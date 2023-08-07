@@ -6,12 +6,16 @@ const create = async(req, res) => {
     try {
         const response = await userService.create({
             email: req.body.email,
-            password: req.body.password
+            password: req.body.password,
+            full_name: req.body.full_name,
+            username: req.body.username,
+            age: req.body.age,
+            gender: req.body.gender,
         });
         return res.status(201).json({
             data: response,
             success: true,
-            message: "Successfully created your account",
+            message: "User successfully registered!",
             err: {}
         })
     } catch (error) {

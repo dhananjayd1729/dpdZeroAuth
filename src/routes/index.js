@@ -1,9 +1,9 @@
 const express = require("express");
 
+const UserController = require("../controllers/user-controller");
+
 const router = express.Router();
 
-const v1ApiRoutes = require("./v1/index");
-
-router.use("/v1", v1ApiRoutes);
+router.post("/register", UserController.create);
 
 module.exports = router;
