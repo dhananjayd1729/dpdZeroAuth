@@ -1,4 +1,4 @@
-const { User } = require("../models/index");
+const { User, Data } = require("../models/index");
 
 class UserRepository {
 
@@ -38,6 +38,39 @@ class UserRepository {
           throw error;
         }
       }
+
+    async getUserById(userId) {
+        try {
+          const user = await User.findByPk(userId, {
+            attributes: ["email", "id"],
+          });
+          return user;
+        } catch (error) {
+          console.log("Something went wrong in repository layer.");
+          throw error;
+        }
+    }
+
+    async findKey(passedKey){
+        try {
+            const response = await Data.findOne({ where: { key: passedKey } });
+            console.log(response);
+            return response;
+          } catch (error) {
+            console.log("Something went wrong in repository layer.");
+            throw error;
+          }
+    }
+
+    async generateKeyValue(data){
+        try {
+           const response = await Data.create(data);
+           return response; 
+        } catch (error) {
+          console.log("Something went wrong in repository layer.");
+          throw error;
+        }
+    }
 }
 
 module.exports = {

@@ -9,6 +9,9 @@ router.post("/register", UserController.create);
 router.post(
     "/token", 
     validateUserAuth,
-    UserController.generateToken);
+    UserController.generateToken
+    );
+router.post("/data", UserController.createData);
+router.get("/data/:key", UserController.retrieveKey);
 
 module.exports = router;

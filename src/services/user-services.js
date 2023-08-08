@@ -19,6 +19,33 @@ class UserService {
         }
     }
 
+    async createKeyValue(data){
+        try {
+            const response = await this.UserRepository.generateKeyValue(data);
+            return response;
+        } catch (error) {
+            console.log("Something went wrong in service layer");
+            throw error;
+        }
+    }
+
+    async isAuthenticated(token) {
+        try {
+          const response = this.verifyToken(token);
+          if (!response) {
+            throw { error: "Invalid token" };
+          }
+          const user = await this.UserRepository.getUserById(response.id);
+          if (!user) {
+            throw { error: "No user with corresponding token exists." };
+          }
+          return user.id;
+        } catch (error) {
+          console.log("Something went wrong in auth process.");
+          throw error;
+        }
+      }
+
     async delete(data){
         try {
             const response = await this.UserRepository.remove(data);
@@ -48,6 +75,17 @@ class UserService {
             throw error;
         }
     }
+
+    async getKey(key){
+        try {
+            const response = await this.UserRepository.findKey(key);
+            return response;
+        } catch (error) {
+            console.log("Something went wrong in repository layer");
+            throw error;
+        }
+    }
+
     comparePassword(userInputPassword, encryptedPassword) {
         try {
           return bcrypt.compareSync(userInputPassword, encryptedPassword);
@@ -55,7 +93,7 @@ class UserService {
           console.log("Something went wrong in password comparison.");
           throw error;
         }
-      }
+    }
 
     async generateTokenAndSignIn(email, plainPassword) {
         try {
@@ -72,7 +110,7 @@ class UserService {
           console.log("Something went wrong in sign in process.");
           throw error;
         }
-      }
+    }
 }
 
 module.exports = UserService;
