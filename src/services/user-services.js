@@ -96,6 +96,16 @@ class UserService {
         }
     }
 
+    async deleteKeyValueData(key){
+        try {
+            const response = await this.UserRepository.deleteData(key);
+            return response;
+        } catch (error) {
+            console.log("Something went wrong in password comparison.");
+            throw error; 
+        }
+    }
+
     comparePassword(userInputPassword, encryptedPassword) {
         try {
           return bcrypt.compareSync(userInputPassword, encryptedPassword);

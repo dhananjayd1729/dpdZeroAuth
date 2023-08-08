@@ -87,6 +87,20 @@ class UserRepository {
        throw error;
      }
     }
+
+    async deleteData(inputKey){
+      try {
+        await Data.destroy({
+          where : {
+              key : inputKey
+          },
+        });
+      return true;
+      } catch (error) {
+        console.log("Something went wrong in repository layer.");
+        throw error;
+      }
+    }
 }
 
 module.exports = {

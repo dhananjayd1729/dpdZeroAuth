@@ -154,10 +154,48 @@ const updateValue = async(req, res) => {
   }
 }
 
+const deleteEntry = async(req, res) => {
+  try {
+    const token = req.headers["x-access-token"];
+    const key  = req.params.key;
+    const user = await userService.isAuthenticated(token);
+    if(!user){
+      return res.status(401).json({
+        data: {},
+        success: false,
+        message: "Unauthorized User"
+    })
+    }
+    const val = await userService.getKey(key);
+    if(!val){
+      return res.status(204).json({
+        success: false,
+        message: "The provided key does not exist in the database."
+    })
+    }
+    
+    await userService.deleteKeyValueData(key);
+
+    return res.status(200).json({
+          success: true,
+          message: "Data deleted successfully."
+      })
+  } catch (error) {
+      console.log("Something went wrong in controller layer");
+      return res.status(500).json({
+          data:{},
+          success: false,
+          message: "Something went wrong",
+          err: error
+      })
+  }
+}
+
 module.exports = {
     create,
     generateToken,
     createData,
     retrieveKey,
-    updateValue
+    updateValue,
+    deleteEntry
 }

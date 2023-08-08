@@ -14,5 +14,6 @@ router.post(
 router.post("/data", UserController.createData);
 router.get("/data/:key", UserController.retrieveKey);
 router.put("/data/:key", UserController.updateValue);
+router.delete("/data/:key", UserController.deleteEntry);
 
 module.exports = router;
