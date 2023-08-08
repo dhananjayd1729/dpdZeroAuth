@@ -13,5 +13,6 @@ router.post(
     );
 router.post("/data", UserController.createData);
 router.get("/data/:key", UserController.retrieveKey);
+router.put("/data/:key", UserController.updateValue);
 
 module.exports = router;

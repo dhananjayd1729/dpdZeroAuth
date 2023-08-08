@@ -86,6 +86,16 @@ class UserService {
         }
     }
 
+    async findAndUpdateValue(key, inputValue){
+        try {
+            const response = await this.UserRepository.findKeyAndUpdate(key, inputValue);
+            return response;
+        } catch (error) {
+            console.log("Something went wrong in repository layer");
+            throw error;
+        }
+    }
+
     comparePassword(userInputPassword, encryptedPassword) {
         try {
           return bcrypt.compareSync(userInputPassword, encryptedPassword);

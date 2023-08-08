@@ -119,9 +119,45 @@ const retrieveKey = async(req, res) => {
   }
 }
 
+const updateValue = async(req, res) => {
+  try {
+    const token = req.headers["x-access-token"];
+    const key  = req.params.key;
+    const value = req.body.value;
+    const user = await userService.isAuthenticated(token);
+    if(!user){
+      return res.status(401).json({
+        data: {},
+        success: false,
+        message: "Unauthorized User"
+    })
+    }
+    const response = await userService.findAndUpdateValue(key, value);
+    if(!response){
+      return res.status(404).json({
+        success: false,
+        message: "data not found"
+    })
+    }
+    return res.status(200).json({
+          success: true,
+          message: "Data updated successfully."
+      })
+  } catch (error) {
+      console.log("Something went wrong in controller layer");
+      return res.status(500).json({
+          data:{},
+          success: false,
+          message: "Something went wrong",
+          err: error
+      })
+  }
+}
+
 module.exports = {
     create,
     generateToken,
     createData,
-    retrieveKey
+    retrieveKey,
+    updateValue
 }

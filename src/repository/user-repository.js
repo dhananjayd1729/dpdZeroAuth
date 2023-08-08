@@ -71,6 +71,22 @@ class UserRepository {
           throw error;
         }
     }
+
+    async findKeyAndUpdate(inputKey, inputValue){
+      try {
+        const [ rowsAffected ] = await Data.update(
+          { value : inputValue },
+          { where: { key : inputKey } }
+          );
+        if (rowsAffected === 0) {
+          return false;
+        }
+        return true;
+     } catch (error) {
+       console.log("Something went wrong in repository layer.");
+       throw error;
+     }
+    }
 }
 
 module.exports = {
