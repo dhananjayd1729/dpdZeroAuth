@@ -110,6 +110,7 @@ class UserService {
 
     async findAndUpdateValue(key, inputValue){
         try {
+            await this.UserRepository.findKey(key);
             const response = await this.UserRepository.findKeyAndUpdate(key, inputValue);
             return response;
         } catch (error) {

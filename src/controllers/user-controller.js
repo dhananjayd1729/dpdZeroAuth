@@ -1,3 +1,4 @@
+const { ValidationError } = require("../utils/errors");
 const UserService = require("../services/user-services");
 const { StatusCodes } = require("http-status-codes");
 const userService = new UserService();
@@ -79,7 +80,7 @@ const retrieveKey = async(req, res) => {
     const key  = req.params.key;
     await userService.isAuthenticated(token);
     const response = await userService.getKey(key);
-    return res.status(StatusCodes.ACCEPTED).json({
+    return res.status(StatusCodes.OK).json({
         success: true,
         data: {key: response.key, value: response.value}  
       })
@@ -96,72 +97,46 @@ const retrieveKey = async(req, res) => {
 
 const updateValue = async(req, res) => {
   try {
-    const token = req.headers["x-access-token"];
+    const token = req.headers.authorization;
     const key  = req.params.key;
     const value = req.body.value;
-    const user = await userService.isAuthenticated(token);
-    if(!user){
-      return res.status(401).json({
-        data: {},
-        success: false,
-        message: "Unauthorized User"
-    })
+    if(!value){
+      throw new ValidationError('error', "VALUE_ERROR", "Value is missing");
     }
-    const response = await userService.findAndUpdateValue(key, value);
-    if(!response){
-      return res.status(404).json({
-        success: false,
-        message: "data not found"
-    })
-    }
-    return res.status(200).json({
+    await userService.isAuthenticated(token);
+    await userService.findAndUpdateValue(key, value);
+    return res.status(StatusCodes.ACCEPTED).json({
           success: true,
           message: "Data updated successfully."
       })
   } catch (error) {
       console.log("Something went wrong in controller layer");
-      return res.status(500).json({
-          data:{},
+      return res.status(error.statusCode).json({
           success: false,
-          message: "Something went wrong",
-          err: error
+          code: error.code,
+          message: error.message
       })
   }
 }
 
 const deleteEntry = async(req, res) => {
   try {
-    const token = req.headers["x-access-token"];
+    const token = req.headers.authorization;
     const key  = req.params.key;
-    const user = await userService.isAuthenticated(token);
-    if(!user){
-      return res.status(401).json({
-        data: {},
-        success: false,
-        message: "Unauthorized User"
-    })
-    }
-    const val = await userService.getKey(key);
-    if(!val){
-      return res.status(204).json({
-        success: false,
-        message: "The provided key does not exist in the database."
-    })
-    }
-    
+    await userService.isAuthenticated(token);
+    await userService.getKey(key);
     await userService.deleteKeyValueData(key);
 
-    return res.status(200).json({
+    return res.status(StatusCodes.ACCEPTED).json({
           success: true,
           message: "Data deleted successfully."
       })
   } catch (error) {
       console.log("Something went wrong in controller layer");
-      return res.status(500).json({
-          data:{},
+      return res.status(error.statusCode || 204).json({
           success: false,
-          message: "Something went wrong",
-          err: error
+          code: error.code,
+          message: error.message
       })
   }
 }
