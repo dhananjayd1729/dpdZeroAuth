@@ -101,7 +101,7 @@ class UserService {
     async getKey(key){
         try {
             const response = await this.UserRepository.findKey(key);
-            return response;
+            return response.dataValues;
         } catch (error) {
             console.log("Something went wrong in repository layer");
             throw error;

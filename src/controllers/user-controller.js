@@ -77,34 +77,18 @@ const retrieveKey = async(req, res) => {
   try {
     const token = req.headers.authorization;
     const key  = req.params.key;
-    const user = await userService.isAuthenticated(token);
-    if(!user){
-      return res.status(401).json({
-        data: {},
-        success: false,
-        message: "Unauthorized User"
-    })
-    }
+    await userService.isAuthenticated(token);
     const response = await userService.getKey(key);
-    if(!response){
-      return res.status(404).json({
-        data: {},
-        success: false,
-        message: "Key not found"
-    })
-    }
-    
-    
-    return res.status(200).json({
-          data: response,
-          success: true,
+    return res.status(StatusCodes.ACCEPTED).json({
+        success: true,
+        data: {key: response.key, value: response.value}  
       })
   } catch (error) {
       console.log("Something went wrong in controller layer");
-      return res.status(500).json({
-          data:{},
+      return res.status(error.statusCode).json({
           success: false,
-          message: "Something went wrong",
+          code: error.code,
+          message: error.message,
           err: error
       })
   }
