@@ -1,6 +1,7 @@
 const { UserRepository } = require("../repository/user-repository");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const { RegistrationErrors, BadRequestError, ValidationError } = require('../utils/errors');
 
 const { JWT_KEY } = require("../config/serverConfig");
 
@@ -9,10 +10,24 @@ class UserService {
        this.UserRepository = new UserRepository();
     }
 
-    async create(data){
+    async create(userData){
         try {
-            const response = await this.UserRepository.create(data);
-            return response;
+            if (!userData.username || !userData.email || !userData.password || !userData.full_name) {
+                throw new BadRequestError('error','INVALID_REQUEST',RegistrationErrors.INVALID_REQUEST);
+            }
+
+            if(!userData.gender){
+                throw new BadRequestError('error','GENDER_REQUIRED',RegistrationErrors.GENDER_REQUIRED);
+            }
+
+            if(userData.gender != "male" && 
+               userData.gender != "female" && 
+               userData.gender != "non-binary"){
+                throw new ValidationError('error','INVALID_REQUEST',"You can choose between male, female & non-binary")
+            }
+            await this.UserRepository.checkUsernameExists(userData.username);
+            await this.UserRepository.getUserByEmail(userData.email);
+            return await this.UserRepository.createUser(userData);
         } catch (error) {
             console.log("Something went wrong in service layer");
             throw error;

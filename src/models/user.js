@@ -31,12 +31,12 @@ module.exports = (sequelize, DataTypes) => {
       type:DataTypes.STRING,
       allowNull : false,
       validate : {
-        isAlphanumeric: true,
-        len : [5, 100]
+        is: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
       }
     },
     username: {
       type : DataTypes.STRING,
+      unique: true,
       allowNull : false,
     },
     full_name: {
@@ -45,12 +45,14 @@ module.exports = (sequelize, DataTypes) => {
     },
     age: {
       type : DataTypes.INTEGER,
-      max : 120,
-      min: 1
+      validate: {
+        min : 1
+      }
     },
     gender: {
       type: DataTypes.ENUM,
-      values: ["Male", "Female"],
+      values: ["male", "female", "non-binary"],
+      allowNull: false
     },
   }, {
     sequelize,
