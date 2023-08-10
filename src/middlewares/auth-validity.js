@@ -1,10 +1,12 @@
+// const { StatusCodes } = require("http-status-codes");
+const { GenerateTokenErrors } = require("../utils/errors");
+
 const validateUserAuth = (req, res, next) => {
     if (!req.body.email || !req.body.password) {
-      return res.status(400).json({
-        data: {},
-        message: "Something went wrong",
+      return res.status(422).json({
         success: false,
-        err: "Email or password missing in the request.",
+        code:"MISSING_FIELDS",
+        message: GenerateTokenErrors.MISSING_FIELDS,
       });
     }
   

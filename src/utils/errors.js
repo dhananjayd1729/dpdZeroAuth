@@ -8,6 +8,19 @@ const RegistrationErrors = Object.freeze({
   INTERNAL_SERVER_ERROR : "An internal server error occurred. Please try again later."
 });
 
+const GenerateTokenErrors = Object.freeze({
+  INVALID_CREDENTIALS : "Invalid credentials. The provided username or password is incorrect.",
+  MISSING_FIELDS : "Missing fields. Please provide both username and password.",
+  INTERNAL_SERVER_ERROR : "An internal server error occurred. Please try again later."
+})
+
+const DataErrors = Object.freeze({
+  "INVALID_KEY": "The provided key is not valid or missing.",
+  "INVALID_VALUE": "The provided value is not valid or missing.",
+  "KEY_EXISTS": "The provided key already exists in the database. To update an existing key, use the update API.",
+  "INVALID_TOKEN": "Invalid access token provided."
+})
+
 
 class BadRequestError extends Error {
   constructor(status, code, message) {
@@ -55,6 +68,8 @@ class InternalServerError extends Error {
 
 module.exports = {
   RegistrationErrors,
+  GenerateTokenErrors,
+  DataErrors,
   BadRequestError,
   ConflictError,
   ValidationError,

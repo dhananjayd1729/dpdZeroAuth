@@ -1,7 +1,7 @@
 const { UserRepository } = require("../repository/user-repository");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const { RegistrationErrors, BadRequestError, ValidationError } = require('../utils/errors');
+const { RegistrationErrors, GenerateTokenErrors, BadRequestError, ValidationError, DataErrors } = require('../utils/errors');
 
 const { JWT_KEY } = require("../config/serverConfig");
 
@@ -36,6 +36,16 @@ class UserService {
 
     async createKeyValue(data){
         try {
+            if(!data.key){
+                throw new ValidationError('error','KEY NOT FOUND', "Key is required field.")
+            }
+            if(!data.value){
+                throw new ValidationError('error','INVALID_VALUE', DataErrors.INVALID_VALUE)
+            }
+            const key = await this.UserRepository.findKey(data.key);
+            if(key){
+                throw new ValidationError('error','KEY_EXISTS', DataErrors.KEY_EXISTS)
+            }
             const response = await this.UserRepository.generateKeyValue(data);
             return response;
         } catch (error) {
@@ -47,13 +57,7 @@ class UserService {
     async isAuthenticated(token) {
         try {
           const response = this.verifyToken(token);
-          if (!response) {
-            throw { error: "Invalid token" };
-          }
           const user = await this.UserRepository.getUserById(response.id);
-          if (!user) {
-            throw { error: "No user with corresponding token exists." };
-          }
           return user.id;
         } catch (error) {
           console.log("Something went wrong in auth process.");
@@ -87,6 +91,9 @@ class UserService {
             return response;
         } catch (error) {
             console.log("Something went wrong in token verification");
+            if (error.name === "JsonWebTokenError"){
+                throw new BadRequestError('false', 'INVALID_TOKEN', DataErrors.INVALID_TOKEN);
+            };
             throw error;
         }
     }
@@ -132,12 +139,11 @@ class UserService {
 
     async generateTokenAndSignIn(email, plainPassword) {
         try {
-          const user = await this.UserRepository.getUserByEmail(email);
+          const user = await this.UserRepository.getUserUsingEmail(email);
           const isPasswordMatching = this.comparePassword(plainPassword, user.password);
-    
-          if (!isPasswordMatching) {
-            console.log("Password doesn't match.");
-            throw { error: "Incorrect password" };
+          
+          if (!user || !isPasswordMatching) {
+            throw new ValidationError('error','INVALID_CREDENTIALS', GenerateTokenErrors.INVALID_CREDENTIALS);
           }
           const newJWT = this.createToken({ email: user.email, id: user.id });
           return newJWT;

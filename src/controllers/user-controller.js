@@ -1,5 +1,4 @@
 const UserService = require("../services/user-services");
-const { UserRegistration } = require("../utils/app-errors");
 const { StatusCodes } = require("http-status-codes");
 const userService = new UserService();
 
@@ -36,57 +35,47 @@ const generateToken = async (req, res) => {
         req.body.email,
         req.body.password
       );
-      return res.status(200).json({
+      return res.status(StatusCodes.CREATED).json({
         success: true,
         message: "Access token generated successfully.",
         data: response,
       });
     } catch (error) {
       console.log(error);
-      return res.status(500).json({
-        data: {},
-        message: "Something went wrong.",
-        err: error,
+      return res.status(error.statusCode).json({
+        message: error.message,
         success: false,
+        code: error.code
       });
     }
 };
 
 const createData = async(req, res) => {
   try {
-    const token = req.headers["x-access-token"];
-    const user = await userService.isAuthenticated(token);
-    if(!user){
-      return res.status(401).json({
-        data: {},
-        success: false,
-        message: "Unauthorized User"
-    })
-    }
-    const response = await userService.createKeyValue({
+    const token = req.headers.authorization;
+    await userService.isAuthenticated(token);
+    await userService.createKeyValue({
           key: req.body.key,
           value: req.body.value,
     });
     
-      return res.status(201).json({
-          data: response,
-          success: true,
-          message: "Data stored successfully."
-      })
+    return res.status(StatusCodes.CREATED).json({
+        success: true,
+        message: "Data stored successfully."
+    })
   } catch (error) {
       console.log("Something went wrong in controller layer");
-      return res.status(500).json({
-          data:{},
+      return res.status(error.statusCode || 500).json({
+          code: error.code,
           success: false,
-          message: "Something went wrong",
-          err: error
+          message: error.message,
       })
   }
 }
 
 const retrieveKey = async(req, res) => {
   try {
-    const token = req.headers["x-access-token"];
+    const token = req.headers.authorization;
     const key  = req.params.key;
     const user = await userService.isAuthenticated(token);
     if(!user){

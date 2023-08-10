@@ -1,11 +1,11 @@
-const { StatusCodes } = require("http-status-codes");
 const { User, Data } = require("../models/index");
 const {
   RegistrationErrors, 
   BadRequestError, 
   ConflictError,
   ValidationError, 
-  InternalServerError
+  InternalServerError,
+  DataErrors
 } = require('../utils/errors');
 
 class UserRepository {
@@ -48,6 +48,7 @@ class UserRepository {
             throw error;
         }
     }
+
     async getUserByEmail(userEmail) {
         try {
           const user = await User.findOne({
@@ -63,13 +64,30 @@ class UserRepository {
           console.log("Something went wrong in repository layer.");
           throw error;
         }
+    }
+
+    async getUserUsingEmail(userEmail) {
+      try {
+        const user = await User.findOne({
+          where: {
+            email: userEmail,
+          },
+        });
+        return user;
+      } catch (error) {
+        console.log("Something went wrong in repository layer.");
+        throw error;
       }
+  }
 
     async getUserById(userId) {
         try {
           const user = await User.findByPk(userId, {
             attributes: ["email", "id"],
           });
+          if (!user) {
+            throw new BadRequestError('error','NOT_FOUND', "User with this token doesn't exists");
+          }
           return user;
         } catch (error) {
           console.log("Something went wrong in repository layer.");
@@ -106,10 +124,32 @@ class UserRepository {
            const response = await Data.create(data);
            return response; 
         } catch (error) {
+          if(error.name === 'SequelizeUniqueConstraintError'){
+            let explanation = [];
+            error.errors.forEach((err) => explanation.push(err.message));
+            if(explanation.includes("key must be unique")){
+              throw new ValidationError('error','INVALID_KEY', DataErrors.INVALID_KEY)
+            }
+          }
           console.log("Something went wrong in repository layer.");
           throw error;
         }
     }
+
+    // async keyExists(inputKey){
+    //   try {
+    //     await Data.findByPk({
+    //       where : {
+    //           key : inputKey
+    //       },
+    //     });
+    //   return true;
+    //   } catch (error) {
+    //     // if(error.name === "")
+    //     console.log("Something went wrong in repository layer.");
+    //     throw error;
+    //   }
+    // }
 
     async findKeyAndUpdate(inputKey, inputValue){
       try {

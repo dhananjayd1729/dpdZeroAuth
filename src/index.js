@@ -1,6 +1,6 @@
 const express = require('express');
+const jwt = require("jsonwebtoken");
 const { PORT } = require("./config/serverConfig.js");
-// const db = require("./models/index");
 const apiRoutes = require("./routes/index.js");
 
 const app = express();
@@ -13,9 +13,6 @@ const prepareAndStartServer = () => {
     app.listen( PORT, () => {
         console.log(`Server started on Port : ${PORT}`);
     });
-    // if (process.env.DB_SYNC) {
-    //     db.sequelize.sync({ alter: true });
-    // }  
 }
 
 prepareAndStartServer();
