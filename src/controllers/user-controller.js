@@ -86,11 +86,10 @@ const retrieveKey = async(req, res) => {
       })
   } catch (error) {
       console.log("Something went wrong in controller layer");
-      return res.status(error.statusCode).json({
+      return res.status(error.statusCode || 500).json({
           success: false,
           code: error.code,
           message: error.message,
-          err: error
       })
   }
 }

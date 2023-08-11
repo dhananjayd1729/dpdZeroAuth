@@ -98,6 +98,9 @@ class UserRepository {
     async findKey(passedKey){
         try {
             const response = await Data.findOne({ where: { key: passedKey } });
+            if(response == null){
+              return response;
+            }
             if(!response){
               throw new ValidationError('error','KEY_NOT_FOUND', "The provided key does not exist in the database.")
             }

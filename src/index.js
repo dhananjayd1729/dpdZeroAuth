@@ -1,5 +1,4 @@
 const express = require('express');
-const jwt = require("jsonwebtoken");
 const { PORT } = require("./config/serverConfig.js");
 const apiRoutes = require("./routes/index.js");
 

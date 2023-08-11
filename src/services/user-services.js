@@ -37,7 +37,7 @@ class UserService {
     async createKeyValue(data){
         try {
             if(!data.key){
-                throw new ValidationError('error','KEY NOT FOUND', "Key is required field.")
+                throw new ValidationError('error','KEY REQUIRED', "Key is required field.")
             }
             if(!data.value){
                 throw new ValidationError('error','INVALID_VALUE', DataErrors.INVALID_VALUE)
